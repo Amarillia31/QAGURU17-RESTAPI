@@ -76,7 +76,7 @@ public class RestApiTests extends BaseTestAPI {
                 .body("id", is(4));
     }
     @Test
-    @Description("Check it is possible to create user")
+    @Description("Check failed user registration")
     void postRegistrationFailedUserTest() {
         given()
                 .log().uri()
@@ -92,6 +92,7 @@ public class RestApiTests extends BaseTestAPI {
                 .body("error", is(error));
     }
     @Test
+    @Description("Check it is possible to delete user")
     void deleteUserTest() {
         given()
                 .when()
