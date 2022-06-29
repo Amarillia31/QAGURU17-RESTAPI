@@ -1,4 +1,4 @@
-package com.elena;
+package com.elena.tests;
 import static org.hamcrest.core.Is.is;
 
 import jdk.jfr.Description;
@@ -7,6 +7,16 @@ import static io.restassured.RestAssured.*;
 import static io.restassured.http.ContentType.JSON;
 
 public class RestApiTests extends BaseTestAPI {
+    String bodyCreateUser = "{ \"name\": \"morpheus\", \"job\": \"leader\" }",
+            bodyUpdateUserJob = "{ \"name\": \"morpheus\", \"job\": \"zion resident\"}",
+            bodyRegistrationPassed = "{ \"email\": \"eve.holt@reqres.in\", \"password\": \"pistol\" }",
+            getBodyRegistrationFailed = "{ \"email\": \"sydney@fife\" }",
+            nameCreateUser = "morpheus",
+            jobCreateUser = "leader",
+            jobUpdateUser = "zion resident",
+            token = "QpwL5tke4Pnpja7X4",
+            error= "Missing password";
+
     @Test
     @Description("Check it is possible to create user")
     void createUserTest() {
