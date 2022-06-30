@@ -34,7 +34,6 @@ public class RestApiTests extends BaseTestAPI {
                 .log().body()
                 .body("data.findAll{it.email =~/.*?@reqres.in/}.email.flatten()[2]",
                         is(listUserEmail));
- //                       hasItem(listUserEmail));
     }
 
     @Test
