@@ -1,10 +1,16 @@
 package com.elena.tests;
-import static org.hamcrest.core.Is.is;
 
+import com.elena.lombok.UserCreated;
+import com.elena.lombok.UserData;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.Test;
-import static io.restassured.RestAssured.*;
-import static io.restassured.http.ContentType.JSON;
+
+import static com.elena.specs.Specs.*;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class RestApiTests extends BaseTestAPI {
     String bodyCreateUser = "{ \"name\": \"morpheus\", \"job\": \"leader\" }",
@@ -15,100 +21,125 @@ public class RestApiTests extends BaseTestAPI {
             jobCreateUser = "leader",
             jobUpdateUser = "zion resident",
             token = "QpwL5tke4Pnpja7X4",
+            listUserEmail = "tobias.funke@reqres.in",
             error= "Missing password";
 
     @Test
-    @Description("Check it is possible to create user")
-    void createUserTest() {
+    void listUser1(){
         given()
-                .log().uri()
-                .log().body()
-                .body(bodyCreateUser)
-                .contentType(JSON)
+                .spec(request)
                 .when()
-                .post("/users?page=2")
+                .get("/users?page=2")
+                .then()
+                .log().body()
+                .body("data.findAll{it.email =~/.*?@reqres.in/}.email.flatten()[2]",
+                        is(listUserEmail));
+ //                       hasItem(listUserEmail));
+    }
+
+    @Test
+    void listUser2(){
+        given()
+                .spec(request)
+                .when()
+                .get("/users?page=2")
+                .then()
+                .log().body()
+                .body("data.findAll{it.email =~/.*?@reqres.in/}.email.flatten()",
+                       hasItem(listUserEmail));
+    }
+
+    @Test
+    @Description("Check it is possible to create user")
+    void createUserTestUseSpecAndLombok() {
+       UserData data = given()
+                .spec(request)
+                .body(bodyCreateUser)
+                .when()
+                .post("/users")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(201)
-                .body("name", is(nameCreateUser))
-                .body("job", is(jobCreateUser));
+                .spec(response201)
+                .extract().as(UserData.class);
+        assertEquals(nameCreateUser, data.getName());
+        assertEquals(jobCreateUser,data.getJob());
     }
+
     @Test
     @Description("Check it is possible update job via put request")
-    void updateUserTestPut() {
-        given()
-                .log().uri()
-                .log().body()
+    void updateUserTestPutSpecAndLombok() {
+        UserData data = (UserData) given()
+                .spec(request)
                 .body(bodyUpdateUserJob)
-                .contentType(JSON)
                 .when()
                 .put("/users/2")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
-                .body("name", is(nameCreateUser))
-                .body("job", is(jobUpdateUser));
+                .spec(responseSpec)
+                .extract().as(UserData.class);
+        assertEquals(nameCreateUser, data.getName());
+        assertEquals(jobUpdateUser,data.getJob());
     }
+
     @Test
     @Description("Check it is possible update job via patch request")
-    void updateUserTestPatch() {
-        given()
-                .log().uri()
-                .log().body()
+    void updateUserTestPatchSpecAndLombok() {
+       UserData data = (UserData) given()
+                .spec(request)
                 .body(bodyUpdateUserJob)
-                .contentType(JSON)
                 .when()
                 .patch("/users/2")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
-                .body("name", is(nameCreateUser))
-                .body("job", is(jobUpdateUser));
+                .spec(responseSpec)
+                .extract().as(UserData.class);
+        assertEquals(nameCreateUser, data.getName());
+        assertEquals(jobUpdateUser,data.getJob());
     }
     @Test
     @Description("Check it is possible to create user")
-    void postRegistrationUserTest() {
-        given()
-                .log().uri()
-                .log().body()
+    void postRegistrationUserTestSpecAndLombok() {
+    UserCreated data = (UserCreated) given()
+                .spec(request)
                 .body(bodyRegistrationPassed)
-                .contentType(JSON)
                 .when()
                 .post("/register")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(200)
-                .body("token", is(token))
-                .body("id", is(4));
+                .spec(responseSpec)
+                .extract().as(UserCreated.class);
+    assertEquals(token,data.getToken());
+    assertEquals(4,data.getId());
     }
     @Test
     @Description("Check failed user registration")
-    void postRegistrationFailedUserTest() {
+    void postRegistrationFailedUserTestSpec() {
         given()
-                .log().uri()
-                .log().body()
+                .spec(request)
                 .body(getBodyRegistrationFailed)
-                .contentType(JSON)
                 .when()
                 .post("/register")
                 .then()
                 .log().status()
                 .log().body()
-                .statusCode(400)
+                .spec(response400)
                 .body("error", is(error));
     }
+
     @Test
     @Description("Check it is possible to delete user")
-    void deleteUserTest() {
+    void deleteUserTestSpec() {
         given()
+                .spec(request)
                 .when()
                 .delete("/users/2")
                 .then()
                 .log().all()
-                .statusCode(204);
+                .spec(response204);
+
     }
 }
