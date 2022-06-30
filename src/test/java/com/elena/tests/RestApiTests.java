@@ -69,7 +69,7 @@ public class RestApiTests extends BaseTestAPI {
     @Test
     @Description("Check it is possible update job via put request")
     void updateUserTestPutSpecAndLombok() {
-        UserData data = (UserData) given()
+        UserData data = given()
                 .spec(request)
                 .body(bodyUpdateUserJob)
                 .when()
@@ -86,7 +86,7 @@ public class RestApiTests extends BaseTestAPI {
     @Test
     @Description("Check it is possible update job via patch request")
     void updateUserTestPatchSpecAndLombok() {
-       UserData data = (UserData) given()
+       UserData data = given()
                 .spec(request)
                 .body(bodyUpdateUserJob)
                 .when()
@@ -102,7 +102,7 @@ public class RestApiTests extends BaseTestAPI {
     @Test
     @Description("Check it is possible to create user")
     void postRegistrationUserTestSpecAndLombok() {
-    UserCreated data = (UserCreated) given()
+    UserCreated data = given()
                 .spec(request)
                 .body(bodyRegistrationPassed)
                 .when()
